@@ -165,6 +165,11 @@ end
     main.lua
     README.md
 ```
+## 📸 Screenshot
+
+![screenshot](output/1.png)
+![screenshot](output/2.png)
+![screenshot](output/3.png)
 
 ## License
 
