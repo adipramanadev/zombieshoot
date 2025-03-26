@@ -7,6 +7,13 @@ function love.load()
     sprites.zombie = love.graphics.newImage('sprites/zombie.png')
     sprites.background = love.graphics.newImage('sprites/background.png')
 
+    -- Load background music and set it to loop
+    backgroundMusic = love.audio.newSource("sounds/background_sounds.mp3",
+                                           "stream")
+    backgroundMusic:setLooping(true) -- Loop background music
+    love.audio.play(backgroundMusic) -- Start playing background music
+    backgroundMusic:setVolume(0.5) -- Set the volume to 50%
+
     player = {}
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
@@ -25,6 +32,14 @@ function love.load()
 end
 
 function love.update(dt)
+    -- Check if the game is over (health is 0)
+    if player.health == 0 then
+        if gamestate ~= 0 then -- If gamestate is not already game over
+            gamestate = 0 -- Set the game state to game over
+            love.audio.stop(backgroundMusic) -- Stop the background music
+            backgroundMusic:setVolume(0.1) -- Set the volume to 10%
+        end
+    end
     if gamestate == 2 then
         if love.keyboard.isDown("d") and player.x < love.graphics.getWidth() then
             player.x = player.x + player.speed * dt
@@ -111,9 +126,12 @@ function love.draw()
     end
     if gamestate == 0 then
         love.graphics.setFont(myFont)
-        love.graphics.printf("Game Over", 0, love.graphics.getHeight() / 2 - 20, love.graphics.getWidth(), "center")
-        love.graphics.printf("Final Score: " .. score, 0, love.graphics.getHeight() / 2 + 20, love.graphics.getWidth(), "center")
-        return  -- Stop drawing other things when game is over
+        love.graphics.printf("Game Over", 0, love.graphics.getHeight() / 2 - 20,
+                             love.graphics.getWidth(), "center")
+        love.graphics.printf("Final Score: " .. score, 0,
+                             love.graphics.getHeight() / 2 + 20,
+                             love.graphics.getWidth(), "center")
+        return -- Stop drawing other things when game is over
     end
     love.graphics.printf("Score: " .. score, 0, love.graphics.getHeight() - 100,
                          love.graphics.getWidth(), "center")
@@ -157,17 +175,22 @@ function love.mousepressed(x, y, button)
         player.y = love.graphics.getHeight() / 2
         zombies = {}
         bullets = {}
+        -- Play background music again
+        love.audio.play(backgroundMusic)
     elseif button == 1 and gamestate == 0 then
-         -- Restart the game after game over
-         gamestate = 2
-         maxTime = 2
-         timer = maxTime
-         score = 0
-         player.health = 3  -- Reset health
-         player.x = love.graphics.getWidth() / 2
-         player.y = love.graphics.getHeight() / 2
-         zombies = {}
-         bullets = {}
+        -- Restart the game after game over
+        love.audio.stop(backgroundMusic) -- Stop the background music
+        gamestate = 2
+        maxTime = 2
+        timer = maxTime
+        score = 0
+        player.health = 3 -- Reset health
+        player.x = love.graphics.getWidth() / 2
+        player.y = love.graphics.getHeight() / 2
+        zombies = {}
+        bullets = {}
+        -- Start playing background music again
+        love.audio.play(backgroundMusic)
     end
 end
 
